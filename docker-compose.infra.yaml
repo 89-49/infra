@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:17
+    container_name: pgsg-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - pgsg-network
+
+networks:
+  pgsg-network:
+    external: true
+
+volumes:
+  postgres_data:
