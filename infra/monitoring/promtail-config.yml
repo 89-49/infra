@@ -1,0 +1,13 @@
+server:
+  http_listen_port: 9080
+
+clients:
+  - url: ${LOKI_URL:-http://loki:3100/loki/api/v1/push} # 로그가 최종 도착할 Loki 주소
+
+scrape_configs:
+  - job_name: kafka
+    kafka:
+      brokers: [ ${BOOTSTRAP_SERVERS:-localhost:9092}]
+      topics: [pgsg-logs]
+      labels:
+        job: ship-flow-logs
