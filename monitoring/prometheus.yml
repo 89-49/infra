@@ -1,0 +1,39 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+#포트 확인 필요
+scrape_configs:
+  - job_name: gateway-server
+    static_configs:
+      - targets: ['gateway-server:8090']
+    metrics_path: /actuator/prometheus
+
+  - job_name: user-service
+    static_configs:
+      - targets: ['user-service:8081']
+    metrics_path: /actuator/prometheus
+
+  - job_name: product-service
+    static_configs:
+      - targets: ['product-service:8082']
+    metrics_path: /actuator/prometheus
+
+  - job_name: trade-service
+    static_configs:
+      - targets: ['trade-service:8083']
+    metrics_path: /actuator/prometheus
+
+  - job_name: reservation-service
+    static_configs:
+      - targets: ['reservation-service:8084']
+    metrics_path: /actuator/prometheus
+
+  - job_name: chat-service
+    static_configs:
+      - targets: ['chat-service:8085']
+    metrics_path: /actuator/prometheus
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093']

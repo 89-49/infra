@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  # 1. 로그 저장소 (창고)
+  loki:
+    image: grafana/loki:2.9.1
+    container_name: pgsg-loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - loki-data:/loki
+    networks:
+      - pgsg-network
+
+  # 2. 로그 수집기 (배달원: Kafka -> Loki)
+  promtail:
+    image: grafana/promtail:2.9.1
+    container_name: pgsg-promtail
+    volumes:
+      - ./promtail-config.yaml:/etc/promtail/config.yml
+      - ./ssl/kafka.server.truststore.jks:/etc/ssl/kafka.server.truststore.jks
+    command: -config.file=/etc/promtail/config.yml
+    environment:
+      - BOOTSTRAP_SERVERS=${BOOTSTRAP_SERVERS} # 환경변수 처리
+    depends_on:
+      - loki
+    networks:
+      - pgsg-network
+
+  # 3. 메트릭 수집
+  prometheus:
+    image: prom/prometheus
+    container_name: pgsg-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    networks:
+      - pgsg-network
+
+  # 4. 시각화 도구 (관제 화면)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: pgsg-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - loki
+      - prometheus
+    networks:
+      - pgsg-network
+
+  # 5. 알림 관리
+  alertmanager:
+    image: prom/alertmanager
+    container_name: pgsg-alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    networks:
+      - pgsg-network
+
+  alertmanager-discord:
+    image: benjojo/alertmanager-discord
+    container_name: pgsg-alertmanager-discord
+    environment:
+      - DISCORD_WEBHOOK=${DISCORD_WEBHOOK}
+    networks:
+      - pgsg-network
+
+networks:
+  pgsg-network:
+    driver: bridge
+
+volumes:
+  loki-data:
+  prometheus-data:
+  grafana-data:
