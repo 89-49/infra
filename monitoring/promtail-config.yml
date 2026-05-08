@@ -10,7 +10,7 @@ scrape_configs:
       brokers: [34.64.35.152:9092,34.22.94.155:9092,34.50.28.59:9092]
       topics: [pgsg-logs]
       tls:
-        insecure_skip_verify: true
+        ca_file: /etc/ssl/kafka.server.truststore.jks
       labels:
         job: ship-flow-logs
 
