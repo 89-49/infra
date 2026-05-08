@@ -1,0 +1,13 @@
+/monitoring/.env
+/.idea/.gitignore
+/monitoring/.idea/.gitignore
+/.idea/discord.xml
+/monitoring/.idea/discord.xml
+/.idea/infra.iml
+/monitoring/ssl/kafka.server.truststore.jks
+/.idea/misc.xml
+/monitoring/.idea/misc.xml
+/.idea/modules.xml
+/monitoring/.idea/modules.xml
+/monitoring/.idea/monitoring.iml
+/.idea/vcs.xml
