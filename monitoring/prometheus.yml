@@ -1,7 +1,7 @@
 global:
   scrape_interval: 15s
   evaluation_interval: 15s
-#포트 확인 필요
+#포트 확인 필요, targets - 실제 서버 주소 작성
 scrape_configs:
   - job_name: gateway-server
     static_configs:
@@ -15,7 +15,7 @@ scrape_configs:
 
   - job_name: product-service
     static_configs:
-      - targets: ['product-service:8082']
+      - targets: ['host.docker.internal:8082']
     metrics_path: /actuator/prometheus
 
   - job_name: trade-service

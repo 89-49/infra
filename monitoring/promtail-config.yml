@@ -2,24 +2,28 @@ server:
   http_listen_port: 9080
 
 clients:
-  - url: ${LOKI_URL:-http://loki:3100/loki/api/v1/push} # 로그가 최종 도착할 Loki 주소
+  - url: http://pgsg-loki:3100/loki/api/v1/push # 로그가 최종 도착할 Loki 주소
 
 scrape_configs:
   - job_name: kafka
     kafka:
       brokers: [34.64.35.152:9092,34.22.94.155:9092,34.50.28.59:9092]
       topics: [pgsg-logs]
-      tls:
-        ca_file: /etc/ssl/kafka.server.truststore.jks
       labels:
-        job: ship-flow-logs
+        job: pgsg-logs
+      authentication:
+        type: ssl
+        tls_config:
+          ca_file: /etc/ssl/kafka.server.truststore.jks
+          insecure_skip_verify: true
 
-pipeline_stages:
-  - json:
-      expressions:
-        level: level
-        service: service_name
-        message: message
-  - labels:
-      level:
-      service:
+
+    pipeline_stages:
+      - json:
+          expressions:
+            level: level
+            service: service_name
+            message: message
+      - labels:
+          level:
+          service:

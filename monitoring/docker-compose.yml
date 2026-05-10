@@ -18,7 +18,7 @@ services:
     image: grafana/promtail:2.9.1
     container_name: pgsg-promtail
     volumes:
-      - ./promtail-config.yaml:/etc/promtail/config.yml
+      - ./promtail-config.yml:/etc/promtail/config.yml
       - ./ssl/kafka.server.truststore.jks:/etc/ssl/kafka.server.truststore.jks
     command: -config.file=/etc/promtail/config.yml
     environment:
