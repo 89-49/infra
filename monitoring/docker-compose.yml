@@ -78,7 +78,7 @@ services:
 
 networks:
   pgsg-network:
-    driver: bridge
+    external: true
 
 volumes:
   loki-data:
