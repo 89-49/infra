@@ -15,7 +15,7 @@ scrape_configs:
 
   - job_name: product-service
     static_configs:
-      - targets: ['host.docker.internal:8082']
+      - targets: ['product-service:8082']
     metrics_path: /actuator/prometheus
 
   - job_name: trade-service

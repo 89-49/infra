@@ -5,25 +5,37 @@ clients:
   - url: http://pgsg-loki:3100/loki/api/v1/push # 로그가 최종 도착할 Loki 주소
 
 scrape_configs:
-  - job_name: kafka
-    kafka:
-      brokers: [34.64.35.152:9092,34.22.94.155:9092,34.50.28.59:9092]
-      topics: [pgsg-logs]
-      labels:
-        job: pgsg-logs
-      authentication:
-        type: ssl
-        tls_config:
-          ca_file: /etc/ssl/kafka.server.truststore.jks
-          insecure_skip_verify: true
-
-
+# 서비스 추가 시 product-service 블록처럼 scrap_configs에 추가
+  - job_name: product-service
+    static_configs:
+      - targets: [ localhost ]
+        labels:
+          job: product-service
+          __path__: /logs/product-service*.log
     pipeline_stages:
-      - json:
-          expressions:
-            level: level
-            service: service_name
-            message: message
+      - regex:
+          expression: '.*\[(?P<level>[A-Z]+)\].*'
       - labels:
           level:
-          service:
+
+#  - job_name: kafka
+#    kafka:
+#      brokers: [${BOOTSTRAP_SERVERS}]
+#      topics: [pgsg-logs]
+#      labels:
+#        job: pgsg-logs
+#      authentication:
+#        type: ssl
+#        tls_config:
+#          ca_file: /etc/ssl/kafka.server.truststore.jks
+#          insecure_skip_verify: true
+#
+#    pipeline_stages:
+#          - json:
+#              expressions:
+#                level: level
+#                service: service_name
+#                message: message
+#          - labels:
+#              level:
+#              service:
