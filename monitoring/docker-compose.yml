@@ -80,6 +80,32 @@ services:
     container_name: pgsg-zipkin
     ports:
       - "9411:9411"
+    environment:
+      - STORAGE_TYPE=mysql
+      - MYSQL_HOST=zipkin-db
+      - MYSQL_USER=${ZIPKIN_DB_USER}
+      - MYSQL_PASS=${ZIPKIN_DB_PASSWORD}
+    networks:
+      - pgsg-network
+    depends_on:
+      zipkin-db:
+          condition: service_healthy
+
+  zipkin-db:
+    image: mysql:8
+    container_name: pgsg-zipkin-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=${ZIPKIN_DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=zipkin
+      - MYSQL_USER=${ZIPKIN_DB_USER}
+      - MYSQL_PASSWORD=${ZIPKIN_DB_PASSWORD}
+    volumes:
+      - zipkin-db-data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - pgsg-network
 
@@ -91,3 +117,4 @@ volumes:
   loki-data:
   prometheus-data:
   grafana-data:
+  zipkin-db-data:
