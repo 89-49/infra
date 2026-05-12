@@ -17,6 +17,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    restart: always
 
   redis:
     image: redis:7-alpine
@@ -25,6 +26,7 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    command: redis-server --appendonly yes --appendfsync everysec
     networks:
       - pgsg-network
     healthcheck:
@@ -32,10 +34,12 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    restart: always
 
 networks:
   pgsg-network:
-    external: true
+    name: pgsg-network
+    driver: bridge
 
 volumes:
   postgres_data:
