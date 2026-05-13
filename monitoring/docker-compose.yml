@@ -17,7 +17,7 @@ services:
     container_name: pgsg-promtail
     volumes:
       - ./promtail-config.yml:/etc/promtail/config.yml
-      - /home/yjj1544/product/logs:/logs
+      - /home/yjj1544/app/product/logs:/logs
     command: -config.file=/etc/promtail/config.yml
 #    environment:
 #      - BOOTSTRAP_SERVERS=${BOOTSTRAP_SERVERS} # 환경변수 처리
