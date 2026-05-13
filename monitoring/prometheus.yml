@@ -10,17 +10,17 @@ scrape_configs:
 
   - job_name: user-service
     static_configs:
-      - targets: ['user-service:8081']
+      - targets: ['34.22.69.213:8081']
     metrics_path: /actuator/prometheus
 
   - job_name: product-service
     static_configs:
-      - targets: ['product-service:8082']
+      - targets: ['10.178.0.2:8082']
     metrics_path: /actuator/prometheus
 
   - job_name: trade-service
     static_configs:
-      - targets: ['trade-service:8083']
+      - targets: ['34.64.117.237:8083']
     metrics_path: /actuator/prometheus
 
   - job_name: reservation-service
