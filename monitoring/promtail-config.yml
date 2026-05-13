@@ -2,7 +2,7 @@ server:
   http_listen_port: 9080
 
 clients:
-  - url: http://pgsg-loki:3100/loki/api/v1/push # 로그가 최종 도착할 Loki 주소
+  - url: http://10.178.0.4:3100/loki/api/v1/push # 로그가 최종 도착할 Loki 주소
 
 scrape_configs:
 # 서비스 추가 시 product-service 블록처럼 scrap_configs에 추가
