@@ -82,8 +82,13 @@ services:
       - "9411:9411"
     environment:
       - STORAGE_TYPE=mysql
+      - MYSQL_HOST=zipkin-db
+      - MYSQL_TCP_PORT=3306
+      - MYSQL_DB=zipkin
+      - MYSQL_USER=${ZIPKIN_DB_USER}
+      - MYSQL_PASS=${ZIPKIN_DB_PASSWORD}
       - MYSQL_USE_SSL=false
-      - MYSQL_JDBC_URL=jdbc:mariadb://${ZIPKIN_DB_USER}:${ZIPKIN_DB_PASSWORD}@zipkin-db:3306/zipkin?allowPublicKeyRetrieval=true&useSSL=false
+      - MYSQL_JDBC_URL=jdbc:mariadb://zipkin-db:3306/zipkin?allowPublicKeyRetrieval=true&useSSL=false
     networks:
       - pgsg-network
     depends_on:
@@ -91,7 +96,7 @@ services:
           condition: service_healthy
 
   zipkin-db:
-    image: mysql:8
+    image: mariadb:10.9
     container_name: pgsg-zipkin-db
     environment:
       - MYSQL_ROOT_PASSWORD=${ZIPKIN_DB_ROOT_PASSWORD}
