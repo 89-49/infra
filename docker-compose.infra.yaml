@@ -1,46 +1,163 @@
 services:
+  # ─── PostgreSQL Primary-Replica ───────────────────────
+#  postgres-primary:
   db:
     image: postgres:17
     container_name: pgsg-db
+    restart: always
     ports:
       - "5432:5432"
     environment:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_DATABASE}
+#      POSTGRES_REPLICATION_USER: ${REPL_USERNAME:-replicator}
+#      POSTGRES_REPLICATION_PASSWORD: ${REPL_PASSWORD}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_primary_data:/var/lib/postgresql/data
+#      - ./postgres/primary.conf:/etc/postgresql/postgresql.conf
+#      - ./postgres/pg_hba.conf:/etc/postgresql/pg_hba.conf
+#    command: postgres -c config_file=/etc/postgresql/postgresql.conf
     networks:
       - pgsg-network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME}" ]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
       interval: 5s
       timeout: 5s
       retries: 5
-    restart: always
 
+#  postgres-replica-1:
+#    image: postgres:17
+#    container_name: pgsg-db-replica-1
+#    restart: always
+#    ports:
+#      - "5433:5432"
+#    environment:
+#      POSTGRES_USER: ${DB_USERNAME}
+#      POSTGRES_PASSWORD: ${DB_PASSWORD}
+#      PGUSER: ${REPL_USERNAME:-replicator}
+#      PGPASSWORD: ${REPL_PASSWORD}
+#    volumes:
+#      - postgres_replica1_data:/var/lib/postgresql/data
+#      - ./postgres/replica.conf:/etc/postgresql/postgresql.conf
+#    command: |
+#      bash -c "
+#      if [ ! -s /var/lib/postgresql/data/PG_VERSION ]; then
+#        pg_basebackup -h pgsg-db -U ${REPL_USERNAME:-replicator} -D /var/lib/postgresql/data -Fp -Xs -R -P
+#      fi
+#      postgres -c config_file=/etc/postgresql/postgresql.conf
+#      "
+#    depends_on:
+#      postgres-primary:
+#        condition: service_healthy
+#    networks:
+#      - pgsg-network
+#
+#  postgres-replica-2:
+#    image: postgres:17
+#    container_name: pgsg-db-replica-2
+#    restart: always
+#    ports:
+#      - "5434:5432"
+#    environment:
+#      POSTGRES_USER: ${DB_USERNAME}
+#      POSTGRES_PASSWORD: ${DB_PASSWORD}
+#      PGUSER: ${REPL_USERNAME:-replicator}
+#      PGPASSWORD: ${REPL_PASSWORD}
+#    volumes:
+#      - postgres_replica2_data:/var/lib/postgresql/data
+#      - ./postgres/replica.conf:/etc/postgresql/postgresql.conf
+#    command: |
+#      bash -c "
+#      if [ ! -s /var/lib/postgresql/data/PG_VERSION ]; then
+#        pg_basebackup -h pgsg-db -U ${REPL_USERNAME:-replicator} -D /var/lib/postgresql/data -Fp -Xs -R -P
+#      fi
+#      postgres -c config_file=/etc/postgresql/postgresql.conf
+#      "
+#    depends_on:
+#      postgres-primary:
+#        condition: service_healthy
+#    networks:
+#      - pgsg-network
+
+  # ─── Redis Master-Replica-Sentinel ────────────────────
+#  redis-master:
   redis:
     image: redis:7-alpine
     container_name: pgsg-redis
+    restart: always
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data
     command: redis-server --appendonly yes --appendfsync everysec
+    volumes:
+      - redis_master_data:/data
     networks:
       - pgsg-network
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 5s
       retries: 5
-    restart: always
+
+#  redis-replica:
+#    image: redis:7-alpine
+#    container_name: pgsg-redis-replica
+#    restart: always
+#    command: redis-server --replicaof pgsg-redis 6379 --appendonly yes
+#    volumes:
+#      - redis_replica_data:/data
+#    depends_on:
+#      redis-master:
+#        condition: service_healthy
+#    networks:
+#      - pgsg-network
+#
+#  redis-sentinel-1:
+#    image: redis:7-alpine
+#    container_name: pgsg-redis-sentinel-1
+#    restart: always
+#    command: redis-sentinel /etc/redis/sentinel.conf
+#    volumes:
+#      - ./redis/sentinel.conf:/etc/redis/sentinel.conf
+#    depends_on:
+#      - redis-master
+#      - redis-replica
+#    networks:
+#      - pgsg-network
+#
+#  redis-sentinel-2:
+#    image: redis:7-alpine
+#    container_name: pgsg-redis-sentinel-2
+#    restart: always
+#    command: redis-sentinel /etc/redis/sentinel.conf
+#    volumes:
+#      - ./redis/sentinel.conf:/etc/redis/sentinel.conf
+#    depends_on:
+#      - redis-master
+#      - redis-replica
+#    networks:
+#      - pgsg-network
+#
+#  redis-sentinel-3:
+#    image: redis:7-alpine
+#    container_name: pgsg-redis-sentinel-3
+#    restart: always
+#    command: redis-sentinel /etc/redis/sentinel.conf
+#    volumes:
+#      - ./redis/sentinel.conf:/etc/redis/sentinel.conf
+#    depends_on:
+#      - redis-master
+#      - redis-replica
+#    networks:
+#      - pgsg-network
 
 networks:
   pgsg-network:
-    name: pgsg-network
-    driver: bridge
+    external: true
 
 volumes:
-  postgres_data:
-  redis_data:
+  postgres_primary_data:
+#  postgres_replica1_data:
+#  postgres_replica2_data:
+  redis_master_data:
+#  redis_replica_data:

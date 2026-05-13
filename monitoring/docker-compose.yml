@@ -11,13 +11,13 @@ services:
     networks:
       - pgsg-network
 
-  # 2. 로그 수집기 (배달원: Kafka -> Loki)
+  # 2. 로그 수집기 (배달원: Kafka -> Loki), 현재는 kafka 연결 실패로 파일 로그에서 loki로 보내는 방식 사용 중
   promtail:
     image: grafana/promtail:2.9.1
     container_name: pgsg-promtail
     volumes:
       - ./promtail-config.yml:/etc/promtail/config.yml
-      - /home/ubuntu/product/logs:/logs
+      - /home/yjj1544/product/logs:/logs
     command: -config.file=/etc/promtail/config.yml
 #    environment:
 #      - BOOTSTRAP_SERVERS=${BOOTSTRAP_SERVERS} # 환경변수 처리
