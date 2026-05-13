@@ -83,7 +83,7 @@ services:
     environment:
       - STORAGE_TYPE=mysql
       - MYSQL_USE_SSL=false
-      - MYSQL_JDBC_URL=jdbc:mysql://${ZIPKIN_DB_USER}:${ZIPKIN_DB_PASSWORD}@zipkin-db:3306/zipkin?allowPublicKeyRetrieval=true&useSSL=false
+      - MYSQL_JDBC_URL=jdbc:mariadb://${ZIPKIN_DB_USER}:${ZIPKIN_DB_PASSWORD}@zipkin-db:3306/zipkin?allowPublicKeyRetrieval=true&useSSL=false
     networks:
       - pgsg-network
     depends_on:
