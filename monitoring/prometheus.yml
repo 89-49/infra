@@ -30,7 +30,7 @@ scrape_configs:
 
   - job_name: chat-service
     static_configs:
-      - targets: ['chat-service:8085']
+      - targets: ['34.64.177.124:8084']
     metrics_path: /actuator/prometheus
 
 alerting:
