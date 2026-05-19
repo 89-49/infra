@@ -8,6 +8,12 @@ services:
     command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - loki-data:/loki
+      - ./loki-config.yml:/etc/loki/local-config.yaml
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - pgsg-network
 
@@ -21,6 +27,11 @@ services:
     command: -config.file=/etc/promtail/config.yml
 #    environment:
 #      - BOOTSTRAP_SERVERS=${BOOTSTRAP_SERVERS} # 환경변수 처리
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     depends_on:
       - loki
     networks:
@@ -36,6 +47,11 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - ./rules:/etc/prometheus/rules
       - prometheus-data:/prometheus
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - pgsg-network
 
@@ -49,6 +65,11 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
     volumes:
       - grafana-data:/var/lib/grafana
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     depends_on:
       - loki
       - prometheus
@@ -63,6 +84,11 @@ services:
       - "9093:9093"
     volumes:
       - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - pgsg-network
 
@@ -71,6 +97,11 @@ services:
     container_name: pgsg-alertmanager-discord
     environment:
       - DISCORD_WEBHOOK=${DISCORD_WEBHOOK}
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - pgsg-network
 
@@ -89,6 +120,11 @@ services:
       - MYSQL_PASS=${ZIPKIN_DB_PASSWORD}
       - MYSQL_USE_SSL=false
       - MYSQL_JDBC_URL=jdbc:mariadb://zipkin-db:3306/zipkin?allowPublicKeyRetrieval=true&useSSL=false
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - pgsg-network
     depends_on:
@@ -110,6 +146,11 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - pgsg-network
 
